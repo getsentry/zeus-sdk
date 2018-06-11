@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`request allows Accept header overrides 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "http://example.org",
+      Object {
+        "headers": Object {
+          "Accept": "text/html",
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`request passes all parameters to fetch 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "http://example.org",
+      Object {
+        "headers": Object {
+          "Accept": "application/json",
+          "Authorization": "bearer yo!",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;

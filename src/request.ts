@@ -1,0 +1,53 @@
+import fetch, { RequestInit, Response } from 'node-fetch';
+
+/** Typedef for a plain object containing only string values. */
+interface StringMap {
+  [key: string]: string;
+}
+
+/**
+ * Parses an error message from the given response.
+ *
+ * First, this function tries to parse an error message from the response body.
+ * If this does not work, it falls back to the HTTP status text.
+ *
+ * @param response A fetch Response object.
+ * @returns A promise that resolves the error.
+ */
+async function parseError(response: Response): Promise<Error> {
+  try {
+    const { message } = await response.json();
+    return new Error(message || `${response.status} ${response.statusText}`);
+  } catch (e) {
+    return new Error(`${response.status} ${response.statusText}`);
+  }
+}
+
+/**
+ * Performs an AJAX request to the given url with the specified options using
+ * fetch.
+ *
+ * After the request has finished, the result is parsed and checked for errors.
+ * In case of an error, the response message is thrown as an error. On success,
+ * the parsed JSON is passed into the promise.
+ *
+ * @param url The destination of the AJAX call.
+ * @param options Options to the fetch call.
+ * @returns A Promise to the parsed response body.
+ */
+export async function request(
+  url: string,
+  options?: RequestInit
+): Promise<object> {
+  const headers: StringMap = { ...(options && options.headers) } as any;
+  if (!headers.Accept) {
+    headers.Accept = 'application/json';
+  }
+
+  const response = await fetch(url, { ...options, headers });
+  if (!response.ok) {
+    throw await parseError(response);
+  }
+
+  return response.status === 204 ? undefined : response.json();
+}
