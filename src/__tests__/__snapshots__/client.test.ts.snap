@@ -1,0 +1,193 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Client createOrUpdateBuild passes build label properly 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://example.org/hooks/feedbeef/builds/1234",
+      Object {
+        "body": Object {
+          "label": "new build label",
+          "ref": undefined,
+          "url": "https://ci/build/1234",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`Client createOrUpdateBuild strips invalid build attributes 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://example.org/hooks/feedbeef/builds/1234",
+      Object {
+        "body": Object {
+          "label": undefined,
+          "ref": undefined,
+          "url": "https://ci/build/1234",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`Client createOrUpdateJob passes job label properly 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://example.org/hooks/feedbeef/builds/1234/jobs/2345",
+      Object {
+        "body": Object {
+          "label": "new job label",
+          "ref": undefined,
+          "result": "unknown",
+          "status": "in_progress",
+          "url": "https://ci/build/1234",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`Client createOrUpdateJob strips invalid job attributes 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://example.org/hooks/feedbeef/builds/1234/jobs/2345",
+      Object {
+        "body": Object {
+          "label": undefined,
+          "ref": undefined,
+          "result": "unknown",
+          "status": "in_progress",
+          "url": "https://ci/build/1234",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`Client uploadArtifact accepts ZEUS_HOOK_BASE without trailing slash 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://example.org/hooks/feedbeef/builds/12345/jobs/54321/artifacts",
+      Object {
+        "file": Array [
+          "FILE_DATA",
+          undefined,
+        ],
+        "type": undefined,
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`Client uploadArtifact uploads a file with explicit name 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://example.org/hooks/feedbeef/builds/12345/jobs/54321/artifacts",
+      Object {
+        "file": Array [
+          "FILE_DATA",
+          "renamed.json",
+        ],
+        "type": undefined,
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`Client uploadArtifact uploads a file with explicit type 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://example.org/hooks/feedbeef/builds/12345/jobs/54321/artifacts",
+      Object {
+        "file": Array [
+          "FILE_DATA",
+          undefined,
+        ],
+        "type": "text/plain",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`Client uploadArtifact uploads a file without explicit type 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://example.org/hooks/feedbeef/builds/12345/jobs/54321/artifacts",
+      Object {
+        "file": Array [
+          "FILE_DATA",
+          undefined,
+        ],
+        "type": undefined,
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": undefined,
+    },
+  ],
+}
+`;
