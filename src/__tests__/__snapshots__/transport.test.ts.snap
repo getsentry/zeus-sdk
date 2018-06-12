@@ -1,0 +1,294 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Transport postForm calls request with a form data and correct headers 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://zeus.ci/something",
+      Object {
+        "body": FormData {
+          "data": Object {
+            "some": Object {
+              "options": undefined,
+              "value": "data",
+            },
+          },
+          "options": undefined,
+        },
+        "headers": Object {
+          "Content-Length": "42",
+          "content-type": "multipart/form-data; boundary=---feedface",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`Transport postForm does not include null or undefined values 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://zeus.ci/something",
+      Object {
+        "body": FormData {
+          "data": Object {
+            "some": Object {
+              "options": undefined,
+              "value": "data",
+            },
+          },
+          "options": undefined,
+        },
+        "headers": Object {
+          "Content-Length": "42",
+          "content-type": "multipart/form-data; boundary=---feedface",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`Transport postForm passes append options to FormData 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://zeus.ci/something",
+      Object {
+        "body": FormData {
+          "data": Object {
+            "some": Object {
+              "options": Object {
+                "filename": "other",
+              },
+              "value": "data",
+            },
+          },
+          "options": undefined,
+        },
+        "headers": Object {
+          "Content-Length": "42",
+          "content-type": "multipart/form-data; boundary=---feedface",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`Transport request accepts Authorization header overrides 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://zeus.ci/something",
+      Object {
+        "headers": Object {
+          "Authorization": "custom",
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`Transport request accepts absolute URLs 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "http://example.org/",
+      Object {
+        "headers": Object {},
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`Transport request accepts options 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://zeus.ci/something",
+      Object {
+        "body": "{\\"some\\":\\"data\\"}",
+        "headers": Object {},
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`Transport request adds the Authorization token header 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://zeus.ci/something",
+      Object {
+        "headers": Object {
+          "Accept": "application/json",
+          "Authorization": "Bearer zeus-u-1234567890",
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`Transport request issues a request without options 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://zeus.ci/something",
+      Object {
+        "headers": Object {},
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`Transport requestJson defaults to an empty body object 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://zeus.ci/something",
+      Object {
+        "body": "{}",
+        "headers": Object {
+          "Content-Type": "application/json",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`Transport requestJson merges headers into the request 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://zeus.ci/something",
+      Object {
+        "body": "{\\"a\\":[1,2],\\"b\\":\\"c\\"}",
+        "headers": Object {
+          "Content-Type": "application/json",
+          "X-Test": "foo bar",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`Transport requestJson serializes a JSON payload into the request 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://zeus.ci/something",
+      Object {
+        "body": "{\\"a\\":[1,2],\\"b\\":\\"c\\"}",
+        "headers": Object {
+          "Content-Type": "application/json",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`Transport requestJson skips null and undefined keys 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://zeus.ci/something",
+      Object {
+        "body": "{\\"some\\":\\"data\\"}",
+        "headers": Object {
+          "Content-Type": "application/json",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": Promise {},
+    },
+  ],
+}
+`;
