@@ -3,10 +3,14 @@ import { request } from '../request';
 
 const fetchMock = fetch as jest.Mock<typeof fetch>;
 
-function mockPromise<T>(value?: T, reason?: string): Promise<T> {
-  return new Promise((resolve, reject) => {
+async function mockPromise<T>(value?: T, reason?: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
     setImmediate(() => {
-      reason ? reject(reason) : resolve(value);
+      if (reason) {
+        reject(reason);
+      } else {
+        resolve(value);
+      }
     });
   });
 }
@@ -45,7 +49,7 @@ describe('request', () => {
   });
 
   test('resolves the parsed JSON result for status 200', async () => {
-    mockFetch(200, () => mockPromise({ foo: 'bar' }));
+    mockFetch(200, async () => mockPromise({ foo: 'bar' }));
     const response = await request('http://example.org');
     expect(response).toEqual({ foo: 'bar' });
   });
@@ -60,33 +64,33 @@ describe('request', () => {
   });
 
   test('throws an error containing the status text', async () => {
-    mockFetch(400, () => mockPromise(undefined, 'empty'), 'BAD REQUEST');
+    mockFetch(400, async () => mockPromise(undefined, 'empty'), 'BAD REQUEST');
 
     try {
       await request('http://example.org');
     } catch (e) {
-      expect(e.toString()).toMatch('400 BAD REQUEST');
+      expect((e as Error).toString()).toMatch('400 BAD REQUEST');
     }
   });
 
   test('throws an error containing the resolved error message', async () => {
     const message = 'Error message';
-    mockFetch(400, () => mockPromise({ message }));
+    mockFetch(400, async () => mockPromise({ message }));
 
     try {
       await request('http://example.org');
     } catch (e) {
-      expect(e.toString()).toMatch(message);
+      expect((e as Error).toString()).toMatch(message);
     }
   });
 
   test('falls back to the status text when parsing errors', async () => {
-    mockFetch(400, () => mockPromise({}), 'BAD REQUEST');
+    mockFetch(400, async () => mockPromise({}), 'BAD REQUEST');
 
     try {
       await request('http://example.org');
     } catch (e) {
-      expect(e.toString()).toMatch('400 BAD REQUEST');
+      expect((e as Error).toString()).toMatch('400 BAD REQUEST');
     }
   });
 });

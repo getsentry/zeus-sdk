@@ -1,9 +1,19 @@
 import fetch, { RequestInit, Response } from 'node-fetch';
 
-/** Typedef for a plain object containing only string values. */
-interface StringMap {
-  [key: string]: string;
-}
+/**
+ * Request options.
+ *
+ * As opposed to the default fetch options, this interface only permits headers
+ * to be passed as object. This is needed as headers are preprocessed by the
+ * request utility.
+ */
+export type RequestOptions = {
+  [P in keyof RequestInit]: P extends 'headers'
+    ? Record<string, string>
+    : RequestInit[P]
+};
+
+export { Response };
 
 /**
  * Parses an error message from the given response.
@@ -16,7 +26,7 @@ interface StringMap {
  */
 async function parseError(response: Response): Promise<Error> {
   try {
-    const { message } = await response.json();
+    const { message } = (await response.json()) as { message?: string };
     return new Error(message || `${response.status} ${response.statusText}`);
   } catch (e) {
     return new Error(`${response.status} ${response.statusText}`);
@@ -35,14 +45,14 @@ async function parseError(response: Response): Promise<Error> {
  * @param options Options to the fetch call.
  * @returns A Promise to the parsed response body.
  */
-export async function request(
+export async function request<T>(
   url: string,
-  options?: RequestInit
-): Promise<object> {
-  const headers: StringMap = { ...(options && options.headers) } as any;
-  if (!headers.Accept) {
-    headers.Accept = 'application/json';
-  }
+  options: RequestOptions = {}
+): Promise<T> {
+  const headers = {
+    Accept: 'application/json',
+    ...options.headers,
+  };
 
   const response = await fetch(url, { ...options, headers });
   if (!response.ok) {
