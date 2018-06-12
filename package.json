@@ -30,10 +30,10 @@
     "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf dist coverage",
     "lint": "run-s lint:prettier lint:tslint",
-    "lint:prettier": "prettier-check '{src,test}/**/*.ts'",
+    "lint:prettier": "prettier-check 'src/**/*.ts'",
     "lint:tslint": "tslint -t stylish -p .",
     "fix": "run-s fix:tslint fix:prettier",
-    "fix:prettier": "prettier --write '{src,test}/**/*.ts'",
+    "fix:prettier": "prettier --write 'src/**/*.ts'",
     "fix:tslint": "tslint --fix -t stylish -p .",
     "test": "jest",
     "test:watch": "jest --watch --notify"
