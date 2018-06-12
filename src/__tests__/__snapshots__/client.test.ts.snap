@@ -74,6 +74,84 @@ exports[`Client createOrUpdateJob passes job label properly 1`] = `
 }
 `;
 
+exports[`Client createOrUpdateJob sets the "failed" status 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://example.org/hooks/feedbeef/builds/1234/jobs/2345",
+      Object {
+        "body": Object {
+          "label": undefined,
+          "ref": undefined,
+          "result": "failed",
+          "status": "finished",
+          "url": "https://ci/build/1234",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`Client createOrUpdateJob sets the "passed" status 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://example.org/hooks/feedbeef/builds/1234/jobs/2345",
+      Object {
+        "body": Object {
+          "label": undefined,
+          "ref": undefined,
+          "result": "passed",
+          "status": "finished",
+          "url": "https://ci/build/1234",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`Client createOrUpdateJob sets the "pending" status 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "https://example.org/hooks/feedbeef/builds/1234/jobs/2345",
+      Object {
+        "body": Object {
+          "label": undefined,
+          "ref": undefined,
+          "result": "unknown",
+          "status": "in_progress",
+          "url": "https://ci/build/1234",
+        },
+        "method": "POST",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "isThrow": false,
+      "value": undefined,
+    },
+  ],
+}
+`;
+
 exports[`Client createOrUpdateJob strips invalid job attributes 1`] = `
 [MockFunction] {
   "calls": Array [

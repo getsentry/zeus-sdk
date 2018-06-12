@@ -127,8 +127,8 @@ describe('Client', () => {
       };
     });
 
-    test('adds a new build', async () => {
-      const data = { some: 'data' };
+    test('resolves the server response', async () => {
+      const data = { id: '1234' };
       mockTransport.instance.requestJson.mockReturnValue(data);
       const response = await client.createOrUpdateBuild(params);
       expect(response).toEqual(data);
@@ -176,8 +176,8 @@ describe('Client', () => {
       };
     });
 
-    test('adds new job', async () => {
-      const data = { some: 'data' };
+    test('resolves the server response', async () => {
+      const data = { id: '1234' };
       mockTransport.instance.requestJson.mockReturnValue(data);
       const response = await client.createOrUpdateJob(params);
       expect(response).toEqual(data);
@@ -200,6 +200,7 @@ describe('Client', () => {
         expect((e as Error).toString()).toMatch(/invalid url/i);
       }
     });
+
     test('rejects without the job parameter', async () => {
       delete params.job;
       try {
@@ -216,6 +217,24 @@ describe('Client', () => {
       } catch (e) {
         expect((e as Error).toString()).toMatch(params.status);
       }
+    });
+
+    test('sets the "pending" status', async () => {
+      params.status = JobStatus.PENDING;
+      await client.createOrUpdateJob(params);
+      expect(mockTransport.instance.requestJson).toMatchSnapshot();
+    });
+
+    test('sets the "passed" status', async () => {
+      params.status = JobStatus.PASSED;
+      await client.createOrUpdateJob(params);
+      expect(mockTransport.instance.requestJson).toMatchSnapshot();
+    });
+
+    test('sets the "failed" status', async () => {
+      params.status = JobStatus.FAILED;
+      await client.createOrUpdateJob(params);
+      expect(mockTransport.instance.requestJson).toMatchSnapshot();
     });
 
     test('passes job label properly', async () => {
