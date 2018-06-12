@@ -11,9 +11,11 @@
   },
   "devDependencies": {
     "@sentry/typescript": "^0.5.4",
+    "@types/form-data": "^2.2.1",
     "@types/jest": "^23.0.0",
     "@types/node": "^10.3.2",
     "@types/node-fetch": "^2.1.1",
+    "@types/whatwg-url": "^6.4.0",
     "jest": "^23.1.0",
     "npm-run-all": "^4.1.2",
     "prettier": "^1.12.1",
@@ -37,6 +39,8 @@
     "test:watch": "jest --watch --notify"
   },
   "dependencies": {
-    "node-fetch": "^2.1.2"
+    "form-data": "^2.3.2",
+    "node-fetch": "^2.1.2",
+    "whatwg-url": "^6.5.0"
   }
 }
