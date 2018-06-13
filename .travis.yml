@@ -15,6 +15,7 @@ node_js:
 
 matrix:
   include:
+    - script: yarn lint
     - script: yarn build
       after_success:
         - npm pack
