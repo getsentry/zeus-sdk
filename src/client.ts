@@ -1,5 +1,5 @@
 import { URL } from 'whatwg-url';
-import { Artifact, Build, Job, JobStatus } from './models';
+import { Artifact, Build, Job, JobStatus, Result, Status } from './models';
 import { FormField, Options, Transport } from './transport';
 import { getHookBase, sanitizeURL } from './utils';
 
@@ -140,16 +140,16 @@ export class Client {
 
     switch (options.status) {
       case JobStatus.PENDING:
-        status = 'in_progress';
-        result = 'unknown';
+        status = Status.PROGRESS;
+        result = Result.UNKNOWN;
         break;
       case JobStatus.PASSED:
-        status = 'finished';
-        result = 'passed';
+        status = Status.FINISHED;
+        result = Result.PASSED;
         break;
       case JobStatus.FAILED:
-        status = 'finished';
-        result = 'failed';
+        status = Status.FINISHED;
+        result = Result.FAILED;
         break;
       case undefined:
         break;

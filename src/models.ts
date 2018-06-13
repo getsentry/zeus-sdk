@@ -4,6 +4,8 @@ export enum Status {
   UNKNOWN = 'unknown',
   /** The entity is queued for execution or processing. */
   QUEUED = 'queued',
+  /** The entity is currently being processed. */
+  PROGRESS = 'in_progress',
   /** Execution has finished and processing is complete. */
   FINISHED = 'finished',
   /** Execution has finished, but results are still being collected. */
