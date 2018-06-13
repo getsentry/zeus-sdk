@@ -135,10 +135,14 @@ export class Client {
     // Deal with statuses. Zeus has knowledge about both 'result' and
     // 'status' for every job, but to make it easier for end user we'll
     // allow to specify only a handful of unified 'statuses'.
-    let status = 'in_progress';
-    let result = 'unknown';
+    let status: string | undefined;
+    let result: string | undefined;
 
     switch (options.status) {
+      case JobStatus.PENDING:
+        status = 'in_progress';
+        result = 'unknown';
+        break;
       case JobStatus.PASSED:
         status = 'finished';
         result = 'passed';
@@ -147,7 +151,6 @@ export class Client {
         status = 'finished';
         result = 'failed';
         break;
-      case JobStatus.PENDING:
       case undefined:
         break;
       default:

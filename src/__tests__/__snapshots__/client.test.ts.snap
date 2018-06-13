@@ -57,8 +57,8 @@ exports[`Client createOrUpdateJob passes job label properly 1`] = `
         "body": Object {
           "label": "new job label",
           "ref": undefined,
-          "result": "unknown",
-          "status": "in_progress",
+          "result": undefined,
+          "status": undefined,
           "url": "https://ci/build/1234",
         },
         "method": "POST",
@@ -161,8 +161,8 @@ exports[`Client createOrUpdateJob strips invalid job attributes 1`] = `
         "body": Object {
           "label": undefined,
           "ref": undefined,
-          "result": "unknown",
-          "status": "in_progress",
+          "result": undefined,
+          "status": undefined,
           "url": "https://ci/build/1234",
         },
         "method": "POST",
