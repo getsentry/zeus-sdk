@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { URL } from 'whatwg-url';
 import { Artifact, Build, Job, JobStatus, Result, Status } from './models';
 import { FormField, Options, Transport } from './transport';
@@ -54,14 +55,18 @@ export interface JobOptions {
 export class Client {
   /** Internal transport used to send requests to Zeus. */
   private readonly transport: Transport;
+  public readonly owner: string;
+  public readonly repo: string;
 
   /**
    * Creates a new API client.
    *
    * @param options Optional configuration parameters for the client.
    */
-  public constructor(options?: Options) {
+  public constructor(options: Options = {}) {
     this.transport = new Transport(options);
+    this.owner = options.owner || '';
+    this.repo = options.repo || '';
   }
 
   /**
@@ -182,5 +187,108 @@ export class Client {
    */
   public getUrl(path: string = ''): string {
     return this.transport.getUrl(path);
+  }
+
+  ///////////////////////////////////////////////
+
+  /**
+   * Downloads all files stored for the commit
+   *
+   * Retrieves the full list of artifacts from Zeus and stores them in the
+   * download directory. Each file is only downloaded once when invoked
+   * multiple times.
+   *
+   * @returns Absolute paths to local copies of all files
+   * @async
+   */
+  // public async downloadAll() {
+  //   const files = await listFiles();
+  //   return downloadFiles(files);
+  // }
+
+  /**
+   * Downloads a file from the store
+   *
+   * The file is placed in the download directory. It is only downloaded once
+   * when invoked multiple times. If the file does not exist, an error is
+   * thrown. Use {@link listFiles} to retrieve available files.
+   *
+   * @param file A file object to download
+   * @returns Absolute path to the local copy of the file
+   * @async
+   */
+  public async downloadArtifact(file: Artifact): Promise<any> {
+    const url = this.getUrl(file.download_url);
+    console.log('url', url);
+    // logger.debug(`Downloading Zeus file ${url} to ${downloadDirectory}`);
+
+    const localFile = join('/tmp/zeus-downloads', file.name);
+    console.log('local file', localFile);
+
+    await fetch(url).then(response => console.log(response));
+
+    return new Promise((resolve, reject) => {
+      resolve('');
+      reject('');
+    });
+    // const stream = await this.transport
+    //   .request(url)
+    //   .pipe(createWriteStream(localFile));
+
+    // const promise = new Promise((resolve, reject) => {
+    //   // NOTE: The timeout is necessary to be able to list files immediately
+    //   stream.on('finish', () => setTimeout(() => resolve(localFile), 100));
+    //   stream.on('error', reject);
+    // });
+
+    // return promise;
+  }
+
+  /**
+   * Retrieves a list of files stored for the commit
+   *
+   * The list is only loaded once if invoked multiple times.
+   *
+   * @returns A list of file objects
+   * @async
+   */
+  public async listFilesForRevision(sha: string): Promise<Artifact[]> {
+    const url = `/api/repos/gh/${this.owner}/${
+      this.repo
+    }/revisions/${sha}/artifacts`;
+    return this.transport.request<Artifact[]>(url);
+  }
+
+  /**
+   * Retrieves a list of files stored for the build
+   *
+   * The list is only loaded once if invoked multiple times.
+   *
+   * @returns A list of file objects
+   * @async
+   */
+  public async listFilesForBuild(buildNumber: number): Promise<Artifact[]> {
+    const url = `/api/repos/gh/${this.owner}/${
+      this.repo
+    }/builds/${buildNumber}/artifacts`;
+    return this.transport.request<Artifact[]>(url);
+  }
+
+  /**
+   * Retrieves a list of files stored for the job
+   *
+   * The list is only loaded once if invoked multiple times.
+   *
+   * @returns A list of file objects
+   * @async
+   */
+  public async listFilesForJob(
+    buildNumber: number,
+    jobNumber: number
+  ): Promise<Artifact[]> {
+    const url = `/api/repos/gh/${this.owner}/${
+      this.repo
+    }/builds/${buildNumber}/jobs/${jobNumber}/artifacts`;
+    return this.transport.request<Artifact[]>(url);
   }
 }

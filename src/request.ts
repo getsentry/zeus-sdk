@@ -39,25 +39,19 @@ async function parseError(response: Response): Promise<Error> {
  *
  * After the request has finished, the result is parsed and checked for errors.
  * In case of an error, the response message is thrown as an error. On success,
- * the parsed JSON is passed into the promise.
+ * the response object is passed into the promise.
  *
  * @param url The destination of the AJAX call.
  * @param options Options to the fetch call.
  * @returns A Promise to the parsed response body.
  */
-export async function request<T>(
+export async function request(
   url: string,
   options: RequestOptions = {}
-): Promise<T> {
-  const headers = {
-    Accept: 'application/json',
-    ...options.headers,
-  };
-
-  const response = await fetch(url, { ...options, headers });
+): Promise<Response> {
+  const response = await fetch(url, options);
   if (!response.ok) {
     throw await parseError(response);
   }
-
-  return response.status === 204 ? undefined : response.json();
+  return response;
 }

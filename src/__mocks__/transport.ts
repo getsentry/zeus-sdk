@@ -3,6 +3,7 @@ export class Transport {
   public postForm: jest.Mock;
   public request: jest.Mock;
   public requestJson: jest.Mock;
+  public requestRaw: jest.Mock;
   public getUrl: jest.Mock;
 
   public constructor() {
@@ -10,6 +11,7 @@ export class Transport {
     this.postForm = jest.fn();
     this.request = jest.fn();
     this.requestJson = jest.fn();
+    this.requestRaw = jest.fn();
     this.getUrl = jest.fn();
   }
 }

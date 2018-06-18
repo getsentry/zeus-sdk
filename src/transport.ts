@@ -1,4 +1,5 @@
 import FormData = require('form-data');
+import { Response } from 'node-fetch';
 import * as util from 'util';
 import { URL } from 'whatwg-url';
 import { request, RequestOptions } from './request';
@@ -29,6 +30,9 @@ export interface Options {
   token?: string;
   /** A logger with the same interface like console. */
   logger?: Logger;
+
+  owner?: string;
+  repo?: string;
 }
 
 /** Options used in `Transport.requestJson`. */
@@ -110,22 +114,32 @@ export class Transport {
     path: string,
     options: RequestOptions = {}
   ): Promise<T> {
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
+      ...options.headers,
+    };
+
+    const response = await this.requestRaw(path, { ...options, headers });
+    return response.status === 204 ? undefined : response.json();
+  }
+
+  /** TODO */
+  public async requestRaw(
+    path: string,
+    options: RequestOptions = {}
+  ): Promise<Response> {
     const headers: Record<string, string> = { ...options.headers };
     const token = this.getToken();
     if (token !== undefined && !headers.Authorization) {
       headers.Authorization = `Bearer ${token.toLowerCase()}`;
     }
 
-    try {
-      const method = options.method || 'GET';
-      const url = this.getUrl(path);
+    const method = options.method || 'GET';
+    const url = this.getUrl(path);
 
-      this.debug(`${method} ${url}`);
-      this.debug(`Authorization: ${headers.Authorization || 'none'}`);
-      return request<T>(url, { ...options, headers });
-    } catch (e) {
-      return Promise.reject(e);
-    }
+    this.debug(`${method} ${url}`);
+    this.debug(`Authorization: ${headers.Authorization || 'none'}`);
+    return request(url, { ...options, headers });
   }
 
   /**
