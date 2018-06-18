@@ -127,6 +127,30 @@ describe('Transport', () => {
         expect((e as Error).toString()).toMatch(/invalid url/i);
       }
     });
+
+    test('resolves the parsed JSON result for status 200', async () => {
+      const transport = new Transport();
+      requestMock.mockImplementation(() => {
+        const resp = new Response(JSON.stringify({ some: 'data' }));
+        return Promise.resolve(resp);
+      });
+
+      const response = await transport.request('something');
+      expect(response).toEqual({ some: 'data' });
+    });
+
+    test('resolves undefined for status 204', async () => {
+      const transport = new Transport();
+      requestMock.mockImplementation(() => {
+        const resp = new Response(JSON.stringify({ some: 'data' }), {
+          status: 204,
+        });
+        return Promise.resolve(resp);
+      });
+
+      const response = await transport.request('something');
+      expect(response).toBeUndefined();
+    });
   });
 
   describe('requestJson', () => {
