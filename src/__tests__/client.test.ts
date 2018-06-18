@@ -249,4 +249,12 @@ describe('Client', () => {
       expect(mockTransport.instance.requestJson).toMatchSnapshot();
     });
   });
+
+  describe('getUrl', () => {
+    test('calls getUrl from transport', async () => {
+      const path = '/build/test';
+      client.getUrl(path);
+      expect(mockTransport.instance.getUrl).toBeCalledWith(path);
+    });
+  });
 });

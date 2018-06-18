@@ -173,4 +173,14 @@ export class Client {
       method: 'POST',
     });
   }
+
+  /**
+   * Computes the absolute URL of an endpoint specified by the given path.
+   *
+   * @param path Path to an endpoint.
+   * @returns The absolute URL to the endpoint.
+   */
+  public getUrl(path: string = ''): string {
+    return this.transport.getUrl(path);
+  }
 }
