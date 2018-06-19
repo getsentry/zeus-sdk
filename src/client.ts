@@ -56,8 +56,11 @@ export interface JobOptions {
 export class Client {
   /** Internal transport used to send requests to Zeus. */
   private readonly transport: Transport;
+  /** GitHub repository owner */
   public readonly owner: string;
+  /** GitHub repository name */
   public readonly repo: string;
+  /** Path to directory where downloaded files are stored */
   public readonly downloadDirectory: string;
 
   /**
@@ -198,17 +201,21 @@ export class Client {
    * The file is placed in the download directory. If the file does not exist,
    * an error is thrown.
    *
-   * @param file A file object to download
+   * @param artifact A file object to download
    * @returns Absolute path to the local copy of the file
    * @async
    */
-  public async downloadArtifact(file: Artifact): Promise<string> {
-    if (!this.downloadDirectory) {
+  public async downloadArtifact(
+    artifact: Artifact,
+    downloadDirectory?: string
+  ): Promise<string> {
+    const downloadDir = downloadDirectory || this.downloadDirectory;
+    if (!downloadDir) {
       throw new Error('Download directory not specified');
     }
 
-    const url = this.getUrl(file.download_url);
-    const localFile = join(this.downloadDirectory, file.name);
+    const url = this.getUrl(artifact.download_url);
+    const localFile = join(downloadDir, artifact.name);
     const fileResponse = await this.transport.requestRaw(url);
     return new Promise<string>((resolve, reject) => {
       const dest = createWriteStream(localFile);
@@ -229,16 +236,18 @@ export class Client {
    * Downloads a list of files from the store
    *
    * The files are placed in the download directory. If one of the files
-   * does not exist, an error is thrown. Use {@link listFilesForRevision},
-   * {@link listFilesForJob}, and {@link listFilesForBuild} to retrieve
+   * does not exist, an error is thrown. Use {@link listArtifactsForRevision},
+   * {@link listArtifactsForJob}, and {@link listArtifactsForBuild} to retrieve
    * available files.
    *
-   * @param files A list of files to download
+   * @param artifacts A list of files to download
    * @returns Absolute paths to local copies of all files
    * @async
    */
-  public async downloadFiles(files: Artifact[]): Promise<string[]> {
-    return Promise.all(files.map(file => this.downloadArtifact(file)));
+  public async downloadArtifacts(artifacts: Artifact[]): Promise<string[]> {
+    return Promise.all(
+      artifacts.map(async artifact => this.downloadArtifact(artifact))
+    );
   }
 
   /**
@@ -247,7 +256,7 @@ export class Client {
    * @returns A list of file objects
    * @async
    */
-  public async listFilesForRevision(sha: string): Promise<Artifact[]> {
+  public async listArtifactsForRevision(sha: string): Promise<Artifact[]> {
     const url = `/api/repos/gh/${this.owner}/${
       this.repo
     }/revisions/${sha}/artifacts`;
@@ -260,7 +269,7 @@ export class Client {
    * @returns A list of file objects
    * @async
    */
-  public async listFilesForBuild(buildNumber: number): Promise<Artifact[]> {
+  public async listArtifactsForBuild(buildNumber: number): Promise<Artifact[]> {
     const url = `/api/repos/gh/${this.owner}/${
       this.repo
     }/builds/${buildNumber}/artifacts`;
@@ -273,7 +282,7 @@ export class Client {
    * @returns A list of file objects
    * @async
    */
-  public async listFilesForJob(
+  public async listArtifactsForJob(
     buildNumber: number,
     jobNumber: number
   ): Promise<Artifact[]> {
@@ -293,8 +302,8 @@ export class Client {
    * @async
    */
   public async downloadAllForRevision(sha: string): Promise<string[]> {
-    const files = await this.listFilesForRevision(sha);
-    return this.downloadFiles(files);
+    const artifacts = await this.listArtifactsForRevision(sha);
+    return this.downloadArtifacts(artifacts);
   }
 
   /**
@@ -307,8 +316,8 @@ export class Client {
    * @async
    */
   public async downloadAllForBuild(buildNumber: number): Promise<string[]> {
-    const files = await this.listFilesForBuild(buildNumber);
-    return this.downloadFiles(files);
+    const artifacts = await this.listArtifactsForBuild(buildNumber);
+    return this.downloadArtifacts(artifacts);
   }
 
   /**
@@ -324,7 +333,7 @@ export class Client {
     buildNumber: number,
     jobNumber: number
   ): Promise<string[]> {
-    const files = await this.listFilesForJob(buildNumber, jobNumber);
-    return this.downloadFiles(files);
+    const artifacts = await this.listArtifactsForJob(buildNumber, jobNumber);
+    return this.downloadArtifacts(artifacts);
   }
 }

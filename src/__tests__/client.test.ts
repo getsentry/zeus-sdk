@@ -267,14 +267,14 @@ describe('Client', () => {
     test('listFilesForRevision calls correct URL', async () => {
       const sha = '8c99609eeed9dc3297728411b9306e2c3786e127';
       const expectedUrl = `/api/repos/gh/getsentry/craft/revisions/${sha}/artifacts`;
-      await client.listFilesForRevision(sha);
+      await client.listArtifactsForRevision(sha);
       expect(mockTransport.instance.request).toBeCalledWith(expectedUrl);
     });
 
     test('listFilesForBuild calls correct URL', async () => {
       const buildNumber = 123;
       const expectedUrl = `/api/repos/gh/getsentry/craft/builds/${buildNumber}/artifacts`;
-      await client.listFilesForBuild(buildNumber);
+      await client.listArtifactsForBuild(buildNumber);
       expect(mockTransport.instance.request).toBeCalledWith(expectedUrl);
     });
 
@@ -282,7 +282,7 @@ describe('Client', () => {
       const buildNumber = 123;
       const jobNumber = 234;
       const expectedUrl = `/api/repos/gh/getsentry/craft/builds/${buildNumber}/jobs/${jobNumber}/artifacts`;
-      await client.listFilesForJob(buildNumber, jobNumber);
+      await client.listArtifactsForJob(buildNumber, jobNumber);
       expect(mockTransport.instance.request).toBeCalledWith(expectedUrl);
     });
   });
