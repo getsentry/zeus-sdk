@@ -1,3 +1,4 @@
+import { createWriteStream } from 'fs';
 import { join } from 'path';
 import { URL } from 'whatwg-url';
 import { Artifact, Build, Job, JobStatus, Result, Status } from './models';
@@ -57,6 +58,7 @@ export class Client {
   private readonly transport: Transport;
   public readonly owner: string;
   public readonly repo: string;
+  public readonly downloadDirectory: string;
 
   /**
    * Creates a new API client.
@@ -67,6 +69,7 @@ export class Client {
     this.transport = new Transport(options);
     this.owner = options.owner || '';
     this.repo = options.repo || '';
+    this.downloadDirectory = options.downloadDirectory || '';
   }
 
   /**
@@ -189,65 +192,57 @@ export class Client {
     return this.transport.getUrl(path);
   }
 
-  ///////////////////////////////////////////////
-
-  /**
-   * Downloads all files stored for the commit
-   *
-   * Retrieves the full list of artifacts from Zeus and stores them in the
-   * download directory. Each file is only downloaded once when invoked
-   * multiple times.
-   *
-   * @returns Absolute paths to local copies of all files
-   * @async
-   */
-  // public async downloadAll() {
-  //   const files = await listFiles();
-  //   return downloadFiles(files);
-  // }
-
   /**
    * Downloads a file from the store
    *
-   * The file is placed in the download directory. It is only downloaded once
-   * when invoked multiple times. If the file does not exist, an error is
-   * thrown. Use {@link listFiles} to retrieve available files.
+   * The file is placed in the download directory. If the file does not exist,
+   * an error is thrown.
    *
    * @param file A file object to download
    * @returns Absolute path to the local copy of the file
    * @async
    */
-  public async downloadArtifact(file: Artifact): Promise<any> {
+  public async downloadArtifact(file: Artifact): Promise<string> {
+    if (!this.downloadDirectory) {
+      throw new Error('Download directory not specified');
+    }
+
     const url = this.getUrl(file.download_url);
-    console.log('url', url);
-    // logger.debug(`Downloading Zeus file ${url} to ${downloadDirectory}`);
-
-    const localFile = join('/tmp/zeus-downloads', file.name);
-    console.log('local file', localFile);
-
-    await fetch(url).then(response => console.log(response));
-
-    return new Promise((resolve, reject) => {
-      resolve('');
-      reject('');
+    const localFile = join(this.downloadDirectory, file.name);
+    const fileResponse = await this.transport.requestRaw(url);
+    return new Promise<string>((resolve, reject) => {
+      const dest = createWriteStream(localFile);
+      fileResponse.body.pipe(dest);
+      fileResponse.body.on('error', err => {
+        reject(err);
+      });
+      dest.on('finish', () => {
+        resolve(localFile);
+      });
+      dest.on('error', err => {
+        reject(err);
+      });
     });
-    // const stream = await this.transport
-    //   .request(url)
-    //   .pipe(createWriteStream(localFile));
+  }
 
-    // const promise = new Promise((resolve, reject) => {
-    //   // NOTE: The timeout is necessary to be able to list files immediately
-    //   stream.on('finish', () => setTimeout(() => resolve(localFile), 100));
-    //   stream.on('error', reject);
-    // });
-
-    // return promise;
+  /**
+   * Downloads a list of files from the store
+   *
+   * The files are placed in the download directory. If one of the files
+   * does not exist, an error is thrown. Use {@link listFilesForRevision},
+   * {@link listFilesForJob}, and {@link listFilesForBuild} to retrieve
+   * available files.
+   *
+   * @param files A list of files to download
+   * @returns Absolute paths to local copies of all files
+   * @async
+   */
+  public async downloadFiles(files: Artifact[]): Promise<string[]> {
+    return Promise.all(files.map(file => this.downloadArtifact(file)));
   }
 
   /**
    * Retrieves a list of files stored for the commit
-   *
-   * The list is only loaded once if invoked multiple times.
    *
    * @returns A list of file objects
    * @async
@@ -262,8 +257,6 @@ export class Client {
   /**
    * Retrieves a list of files stored for the build
    *
-   * The list is only loaded once if invoked multiple times.
-   *
    * @returns A list of file objects
    * @async
    */
@@ -277,8 +270,6 @@ export class Client {
   /**
    * Retrieves a list of files stored for the job
    *
-   * The list is only loaded once if invoked multiple times.
-   *
    * @returns A list of file objects
    * @async
    */
@@ -290,5 +281,50 @@ export class Client {
       this.repo
     }/builds/${buildNumber}/jobs/${jobNumber}/artifacts`;
     return this.transport.request<Artifact[]>(url);
+  }
+
+  /**
+   * Downloads all files stored for the revision
+   *
+   * Retrieves the full list of artifacts from Zeus and stores them in the
+   * download directory.
+   *
+   * @returns Absolute paths to local copies of all files
+   * @async
+   */
+  public async downloadAllForRevision(sha: string): Promise<string[]> {
+    const files = await this.listFilesForRevision(sha);
+    return this.downloadFiles(files);
+  }
+
+  /**
+   * Downloads all files stored for the build
+   *
+   * Retrieves the full list of artifacts from Zeus for the given build and
+   * stores them in the download directory.
+   *
+   * @returns Absolute paths to local copies of all files
+   * @async
+   */
+  public async downloadAllForBuild(buildNumber: number): Promise<string[]> {
+    const files = await this.listFilesForBuild(buildNumber);
+    return this.downloadFiles(files);
+  }
+
+  /**
+   * Downloads all files stored for the job
+   *
+   * Retrieves the full list of artifacts from Zeus for the given job and
+   * stores them in the download directory.
+   *
+   * @returns Absolute paths to local copies of all files
+   * @async
+   */
+  public async downloadAllForJob(
+    buildNumber: number,
+    jobNumber: number
+  ): Promise<string[]> {
+    const files = await this.listFilesForJob(buildNumber, jobNumber);
+    return this.downloadFiles(files);
   }
 }

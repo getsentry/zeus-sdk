@@ -30,9 +30,12 @@ export interface Options {
   token?: string;
   /** A logger with the same interface like console. */
   logger?: Logger;
-
+  /** Repository owner */
   owner?: string;
+  /** Repository name */
   repo?: string;
+  /** Download directory */
+  downloadDirectory?: string;
 }
 
 /** Options used in `Transport.requestJson`. */
@@ -99,6 +102,37 @@ export class Transport {
    * a fully qualified URL with protocol and host. In that case, the request is
    * performed to the path as is.
    *
+   *
+   * If configured, the authorization token is added to the request headers. It
+   * can be overriden by passing a value for the "Authorization" header.
+   *
+   * On success, the raw result is passed into the promise
+   *
+   * @param path The endpoint of the API call.
+   * @param options Options to the `fetch` call.
+   * @returns A Promise to the parsed response body.
+   */
+  public async requestRaw(
+    path: string,
+    options: RequestOptions = {}
+  ): Promise<Response> {
+    const headers: Record<string, string> = { ...options.headers };
+    const token = this.getToken();
+    if (token !== undefined && !headers.Authorization) {
+      headers.Authorization = `Bearer ${token.toLowerCase()}`;
+    }
+
+    const method = options.method || 'GET';
+    const url = this.getUrl(path);
+
+    this.debug(`${method} ${url}`);
+    this.debug(`Authorization: ${headers.Authorization || 'none'}`);
+    return request(url, { ...options, headers });
+  }
+
+  /**
+   * Performs an API request and converts the response to JSON.
+   *
    * If configured, the authorization token is added to the request headers. It
    * can be overriden by passing a value for the "Authorization" header.
    *
@@ -121,25 +155,6 @@ export class Transport {
 
     const response = await this.requestRaw(path, { ...options, headers });
     return response.status === 204 ? undefined : response.json();
-  }
-
-  /** TODO */
-  public async requestRaw(
-    path: string,
-    options: RequestOptions = {}
-  ): Promise<Response> {
-    const headers: Record<string, string> = { ...options.headers };
-    const token = this.getToken();
-    if (token !== undefined && !headers.Authorization) {
-      headers.Authorization = `Bearer ${token.toLowerCase()}`;
-    }
-
-    const method = options.method || 'GET';
-    const url = this.getUrl(path);
-
-    this.debug(`${method} ${url}`);
-    this.debug(`Authorization: ${headers.Authorization || 'none'}`);
-    return request(url, { ...options, headers });
   }
 
   /**
