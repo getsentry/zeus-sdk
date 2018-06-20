@@ -8,4 +8,6 @@ function createWriteStream(): any {
   };
 }
 
-export { createWriteStream };
+const existsSync = jest.fn();
+const lstatSync = jest.fn();
+export { createWriteStream, existsSync, lstatSync };

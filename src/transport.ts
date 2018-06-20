@@ -30,12 +30,6 @@ export interface Options {
   token?: string;
   /** A logger with the same interface like console. */
   logger?: Logger;
-  /** Repository owner */
-  owner?: string;
-  /** Repository name */
-  repo?: string;
-  /** Download directory */
-  downloadDirectory?: string;
 }
 
 /** Options used in `Transport.requestJson`. */
@@ -101,7 +95,6 @@ export class Transport {
    * The request is performed relative to the configured url, unless the path is
    * a fully qualified URL with protocol and host. In that case, the request is
    * performed to the path as is.
-   *
    *
    * If configured, the authorization token is added to the request headers. It
    * can be overriden by passing a value for the "Authorization" header.

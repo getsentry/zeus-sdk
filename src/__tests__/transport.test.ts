@@ -141,12 +141,13 @@ describe('Transport', () => {
 
     test('resolves undefined for status 204', async () => {
       const transport = new Transport();
-      requestMock.mockImplementation(() => {
-        const resp = new Response(JSON.stringify({ some: 'data' }), {
-          status: 204,
-        });
-        return Promise.resolve(resp);
-      });
+
+      requestMock.mockImplementation(
+        async () =>
+          new Response(JSON.stringify({ some: 'data' }), {
+            status: 204,
+          })
+      );
 
       const response = await transport.request('something');
       expect(response).toBeUndefined();
