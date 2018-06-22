@@ -1,3 +1,4 @@
+import { Response } from 'node-fetch';
 import { request } from '../request';
 import { DEFAULT_URL, FormField, Transport } from '../transport';
 import { noop } from '../utils';
@@ -9,7 +10,9 @@ const requestMock: jest.Mock<typeof request> = request as any;
 describe('Transport', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    requestMock.mockReturnValue(Promise.resolve({ some: 'data' }));
+    requestMock.mockReturnValue(
+      Promise.resolve(new Response(JSON.stringify({ some: 'data' })))
+    );
 
     // This causes some issues in Node 9.4.0 inside jest
     console.debug = noop;
@@ -123,6 +126,31 @@ describe('Transport', () => {
       } catch (e) {
         expect((e as Error).toString()).toMatch(/invalid url/i);
       }
+    });
+
+    test('resolves the parsed JSON result for status 200', async () => {
+      const transport = new Transport();
+      requestMock.mockImplementation(() => {
+        const resp = new Response(JSON.stringify({ some: 'data' }));
+        return Promise.resolve(resp);
+      });
+
+      const response = await transport.request('something');
+      expect(response).toEqual({ some: 'data' });
+    });
+
+    test('resolves undefined for status 204', async () => {
+      const transport = new Transport();
+
+      requestMock.mockImplementation(
+        async () =>
+          new Response(JSON.stringify({ some: 'data' }), {
+            status: 204,
+          })
+      );
+
+      const response = await transport.request('something');
+      expect(response).toBeUndefined();
     });
   });
 

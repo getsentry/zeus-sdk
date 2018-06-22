@@ -1,4 +1,5 @@
 import FormData = require('form-data');
+import { Response } from 'node-fetch';
 import * as util from 'util';
 import { URL } from 'whatwg-url';
 import { request, RequestOptions } from './request';
@@ -98,6 +99,36 @@ export class Transport {
    * If configured, the authorization token is added to the request headers. It
    * can be overriden by passing a value for the "Authorization" header.
    *
+   * On success, the raw result is passed into the promise
+   *
+   * @param path The endpoint of the API call.
+   * @param options Options to the `fetch` call.
+   * @returns A Promise to the parsed response body.
+   */
+  public async requestRaw(
+    path: string,
+    options: RequestOptions = {}
+  ): Promise<Response> {
+    const headers: Record<string, string> = { ...options.headers };
+    const token = this.getToken();
+    if (token !== undefined && !headers.Authorization) {
+      headers.Authorization = `Bearer ${token.toLowerCase()}`;
+    }
+
+    const method = options.method || 'GET';
+    const url = this.getUrl(path);
+
+    this.debug(`${method} ${url}`);
+    this.debug(`Authorization: ${headers.Authorization || 'none'}`);
+    return request(url, { ...options, headers });
+  }
+
+  /**
+   * Performs an API request and converts the response to JSON.
+   *
+   * If configured, the authorization token is added to the request headers. It
+   * can be overriden by passing a value for the "Authorization" header.
+   *
    * On success, the parsed JSON result is passed into the promise. In case the
    * request fails or returns with a status code outside of the 200
    * range, an error is thrown with the response message field or status text.
@@ -110,22 +141,13 @@ export class Transport {
     path: string,
     options: RequestOptions = {}
   ): Promise<T> {
-    const headers: Record<string, string> = { ...options.headers };
-    const token = this.getToken();
-    if (token !== undefined && !headers.Authorization) {
-      headers.Authorization = `Bearer ${token.toLowerCase()}`;
-    }
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
+      ...options.headers,
+    };
 
-    try {
-      const method = options.method || 'GET';
-      const url = this.getUrl(path);
-
-      this.debug(`${method} ${url}`);
-      this.debug(`Authorization: ${headers.Authorization || 'none'}`);
-      return request<T>(url, { ...options, headers });
-    } catch (e) {
-      return Promise.reject(e);
-    }
+    const response = await this.requestRaw(path, { ...options, headers });
+    return response.status === 204 ? undefined : response.json();
   }
 
   /**

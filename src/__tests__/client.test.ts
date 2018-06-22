@@ -1,12 +1,17 @@
+import { existsSync, lstatSync } from 'fs';
 import { Transport } from '../__mocks__/transport';
+import { Artifact, JobStatus, Status } from '../models';
 
 // Mock the transport module and make sure we've imported the same instance.
 // The name must start with "mock", to bypass jest's module factory protection.
 const mockTransport = Transport;
 jest.mock('../transport', () => ({ Transport: mockTransport }));
+jest.mock('fs');
 
 import { BuildOptions, Client, JobOptions, UploadOptions } from '../client';
-import { JobStatus } from '../models';
+
+const existsSyncMock = existsSync as jest.Mock<typeof existsSync>;
+const lstatSyncMock = lstatSync as jest.Mock<typeof lstatSync>;
 
 describe('Client', () => {
   const env = { ...process.env };
@@ -255,6 +260,77 @@ describe('Client', () => {
       const path = '/build/test';
       client.getUrl(path);
       expect(mockTransport.instance.getUrl).toBeCalledWith(path);
+    });
+  });
+
+  describe('listFiles', () => {
+    const owner = 'getsentry';
+    const repo = 'craft';
+    beforeEach(() => {
+      client = new Client({ owner, repo });
+    });
+
+    test('listFilesForRevision calls correct URL', async () => {
+      const sha = '8c99609eeed9dc3297728411b9306e2c3786e127';
+      const expectedUrl = `/api/repos/gh/getsentry/craft/revisions/${sha}/artifacts`;
+      await client.listArtifactsForRevision(owner, repo, sha);
+      expect(mockTransport.instance.request).toBeCalledWith(expectedUrl);
+    });
+
+    test('listFilesForBuild calls correct URL', async () => {
+      const buildNumber = 123;
+      const expectedUrl = `/api/repos/gh/getsentry/craft/builds/${buildNumber}/artifacts`;
+      await client.listArtifactsForBuild(owner, repo, buildNumber);
+      expect(mockTransport.instance.request).toBeCalledWith(expectedUrl);
+    });
+
+    test('listFilesForJob calls correct URL', async () => {
+      const buildNumber = 123;
+      const jobNumber = 234;
+      const expectedUrl = `/api/repos/gh/getsentry/craft/builds/${buildNumber}/jobs/${jobNumber}/artifacts`;
+      await client.listArtifactsForJob(owner, repo, buildNumber, jobNumber);
+      expect(mockTransport.instance.request).toBeCalledWith(expectedUrl);
+    });
+  });
+
+  describe('downloadArtifact', () => {
+    const defaultDirectory = '/downloads';
+    const fileName = 'file.txt';
+    const artifact: Artifact = {
+      download_url: 'http://zeus/download/file.txt',
+      id: '123',
+      name: fileName,
+      status: Status.UNKNOWN,
+      type: 'text/plain',
+    };
+    beforeEach(() => {
+      client = new Client({ defaultDirectory });
+    });
+
+    test('saves artifact to a file', async () => {
+      expect.assertions(1);
+      mockTransport.instance.requestRaw.mockImplementation(() => ({
+        body: {
+          on: jest.fn(),
+          pipe: jest.fn(),
+        },
+      }));
+
+      // tslint:disable-next-line
+      existsSyncMock.mockReturnValue(true);
+      lstatSyncMock.mockReturnValue({ isDirectory: () => true });
+
+      const filePath = await client.downloadArtifact(artifact);
+
+      expect(filePath).toBe(`${defaultDirectory}/${fileName}`);
+    });
+
+    test('returns error if downloadDirectory is not provided', async () => {
+      expect.assertions(1);
+      client = new Client();
+      expect(client.downloadArtifact(artifact)).rejects.toThrowError(
+        /directory not specified/i
+      );
     });
   });
 });

@@ -1,6 +1,8 @@
+import { createWriteStream, existsSync, lstatSync } from 'fs';
+import { join } from 'path';
 import { URL } from 'whatwg-url';
 import { Artifact, Build, Job, JobStatus, Result, Status } from './models';
-import { FormField, Options, Transport } from './transport';
+import { FormField, Options as TransportOptions, Transport } from './transport';
 import { getHookBase, sanitizeURL } from './utils';
 
 /** Default URL of the Zeus server. */
@@ -48,20 +50,29 @@ export interface JobOptions {
   ref?: string;
 }
 
+/** Options passed to `Client` constructor */
+export interface Options extends TransportOptions {
+  /** Default download directory. */
+  defaultDirectory?: string;
+}
+
 /**
  * Zeus API client.
  */
 export class Client {
   /** Internal transport used to send requests to Zeus. */
   private readonly transport: Transport;
+  /** Path to directory where downloaded files are stored */
+  public readonly defaultDirectory: string;
 
   /**
    * Creates a new API client.
    *
    * @param options Optional configuration parameters for the client.
    */
-  public constructor(options?: Options) {
+  public constructor(options: Options = {}) {
     this.transport = new Transport(options);
+    this.defaultDirectory = options.defaultDirectory || '';
   }
 
   /**
@@ -182,5 +193,187 @@ export class Client {
    */
   public getUrl(path: string = ''): string {
     return this.transport.getUrl(path);
+  }
+
+  /**
+   * Downloads a file from the store
+   *
+   * The file is placed in the download directory. If the file does not exist,
+   * an error is thrown.
+   *
+   * @param artifact A file object to download
+   * @param downloadDirectory A local directory to store the file
+   * @returns Absolute path to the local copy of the file
+   */
+  public async downloadArtifact(
+    artifact: Artifact,
+    downloadDirectory: string = this.defaultDirectory
+  ): Promise<string> {
+    if (!downloadDirectory) {
+      throw new Error('Download directory not specified');
+    }
+    if (!existsSync(downloadDirectory)) {
+      throw new Error(`Directory does not exist: ${downloadDirectory}`);
+    }
+    if (!lstatSync(downloadDirectory).isDirectory()) {
+      throw new Error(`${downloadDirectory}: not a directory`);
+    }
+
+    const url = this.getUrl(artifact.download_url);
+    const localFile = join(downloadDirectory, artifact.name);
+    const fileResponse = await this.transport.requestRaw(url);
+    return new Promise<string>((resolve, reject) => {
+      const dest = createWriteStream(localFile);
+      fileResponse.body.pipe(dest);
+      fileResponse.body.on('error', err => {
+        reject(err);
+      });
+      dest.on('finish', () => {
+        resolve(localFile);
+      });
+      dest.on('error', err => {
+        reject(err);
+      });
+    });
+  }
+
+  /**
+   * Downloads a list of files from the store
+   *
+   * The files are placed in the download directory. If one of the files
+   * does not exist, an error is thrown. Use {@link listArtifactsForRevision},
+   * {@link listArtifactsForJob}, and {@link listArtifactsForBuild} to retrieve
+   * available files.
+   *
+   * @param artifacts A list of files to download
+   * @returns Absolute paths to local copies of all files
+   */
+  public async downloadArtifacts(artifacts: Artifact[]): Promise<string[]> {
+    return Promise.all(
+      artifacts.map(async artifact => this.downloadArtifact(artifact))
+    );
+  }
+
+  /**
+   * Retrieves a list of files stored for the commit
+   *
+   * @param owner GitHub repository owner
+   * @param repo GitHub repository name
+   * @param sha A commit revision (git hash)
+   * @returns A list of file objects
+   */
+  public async listArtifactsForRevision(
+    owner: string,
+    repo: string,
+    sha: string
+  ): Promise<Artifact[]> {
+    const url = `/api/repos/gh/${owner}/${repo}/revisions/${sha}/artifacts`;
+    return this.transport.request<Artifact[]>(url);
+  }
+
+  /**
+   * Retrieves a list of files stored for the build
+   *
+   * @param owner GitHub repository owner
+   * @param repo GitHub repository name
+   * @param buildNumber A build number (not ID) in Zeus
+   * @returns A list of file objects
+   */
+  public async listArtifactsForBuild(
+    owner: string,
+    repo: string,
+    buildNumber: number
+  ): Promise<Artifact[]> {
+    const url = `/api/repos/gh/${owner}/${repo}/builds/${buildNumber}/artifacts`;
+    return this.transport.request<Artifact[]>(url);
+  }
+
+  /**
+   * Retrieves a list of files stored for the job
+   *
+   * @param owner GitHub repository owner
+   * @param repo GitHub repository name
+   * @param buildNumber A build number (not ID) in Zeus
+   * @param jobNumber A job number (not ID) in Zeus
+   * @returns A list of file objects
+   */
+  public async listArtifactsForJob(
+    owner: string,
+    repo: string,
+    buildNumber: number,
+    jobNumber: number
+  ): Promise<Artifact[]> {
+    const url = `/api/repos/gh/${owner}/${repo}/builds/${buildNumber}/jobs/${jobNumber}/artifacts`;
+    return this.transport.request<Artifact[]>(url);
+  }
+
+  /**
+   * Downloads all files stored for the revision
+   *
+   * Retrieves the full list of artifacts from Zeus and stores them in the
+   * download directory.
+   *
+   * @param owner GitHub repository owner
+   * @param repo GitHub repository name
+   * @returns Absolute paths to local copies of all files
+   */
+  public async downloadAllForRevision(
+    owner: string,
+    repo: string,
+    sha: string
+  ): Promise<string[]> {
+    const artifacts = await this.listArtifactsForRevision(owner, repo, sha);
+    return this.downloadArtifacts(artifacts);
+  }
+
+  /**
+   * Downloads all files stored for the build
+   *
+   * Retrieves the full list of artifacts from Zeus for the given build and
+   * stores them in the download directory.
+   *
+   * @param owner GitHub repository owner
+   * @param repo GitHub repository name
+   * @param buildNumber A build number (not ID) in Zeus
+   * @returns Absolute paths to local copies of all files
+   */
+  public async downloadAllForBuild(
+    owner: string,
+    repo: string,
+    buildNumber: number
+  ): Promise<string[]> {
+    const artifacts = await this.listArtifactsForBuild(
+      owner,
+      repo,
+      buildNumber
+    );
+    return this.downloadArtifacts(artifacts);
+  }
+
+  /**
+   * Downloads all files stored for the job
+   *
+   * Retrieves the full list of artifacts from Zeus for the given job and
+   * stores them in the download directory.
+   *
+   * @param owner GitHub repository owner
+   * @param repo GitHub repository name
+   * @param buildNumber A build number (not ID) in Zeus
+   * @param jobNumber A job number (not ID) in Zeus
+   * @returns Absolute paths to local copies of all files
+   */
+  public async downloadAllForJob(
+    owner: string,
+    repo: string,
+    buildNumber: number,
+    jobNumber: number
+  ): Promise<string[]> {
+    const artifacts = await this.listArtifactsForJob(
+      owner,
+      repo,
+      buildNumber,
+      jobNumber
+    );
+    return this.downloadArtifacts(artifacts);
   }
 }

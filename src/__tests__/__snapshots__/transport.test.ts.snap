@@ -16,6 +16,7 @@ exports[`Transport postForm calls request with a form data and correct headers 1
           "options": undefined,
         },
         "headers": Object {
+          "Accept": "application/json",
           "Content-Length": "42",
           "content-type": "multipart/form-data; boundary=---feedface",
         },
@@ -48,6 +49,7 @@ exports[`Transport postForm does not include null or undefined values 1`] = `
           "options": undefined,
         },
         "headers": Object {
+          "Accept": "application/json",
           "Content-Length": "42",
           "content-type": "multipart/form-data; boundary=---feedface",
         },
@@ -82,6 +84,7 @@ exports[`Transport postForm passes append options to FormData 1`] = `
           "options": undefined,
         },
         "headers": Object {
+          "Accept": "application/json",
           "Content-Length": "42",
           "content-type": "multipart/form-data; boundary=---feedface",
         },
@@ -105,6 +108,7 @@ exports[`Transport request accepts Authorization header overrides 1`] = `
       "https://zeus.ci/something",
       Object {
         "headers": Object {
+          "Accept": "application/json",
           "Authorization": "custom",
         },
       },
@@ -125,7 +129,9 @@ exports[`Transport request accepts absolute URLs 1`] = `
     Array [
       "http://example.org/",
       Object {
-        "headers": Object {},
+        "headers": Object {
+          "Accept": "application/json",
+        },
       },
     ],
   ],
@@ -145,7 +151,9 @@ exports[`Transport request accepts options 1`] = `
       "https://zeus.ci/something",
       Object {
         "body": "{\\"some\\":\\"data\\"}",
-        "headers": Object {},
+        "headers": Object {
+          "Accept": "application/json",
+        },
         "method": "POST",
       },
     ],
@@ -187,7 +195,9 @@ exports[`Transport request issues a request without options 1`] = `
     Array [
       "https://zeus.ci/something",
       Object {
-        "headers": Object {},
+        "headers": Object {
+          "Accept": "application/json",
+        },
       },
     ],
   ],
@@ -208,6 +218,7 @@ exports[`Transport requestJson defaults to an empty body object 1`] = `
       Object {
         "body": "{}",
         "headers": Object {
+          "Accept": "application/json",
           "Content-Type": "application/json",
         },
         "method": "POST",
@@ -231,6 +242,7 @@ exports[`Transport requestJson merges headers into the request 1`] = `
       Object {
         "body": "{\\"a\\":[1,2],\\"b\\":\\"c\\"}",
         "headers": Object {
+          "Accept": "application/json",
           "Content-Type": "application/json",
           "X-Test": "foo bar",
         },
@@ -255,6 +267,7 @@ exports[`Transport requestJson serializes a JSON payload into the request 1`] = 
       Object {
         "body": "{\\"a\\":[1,2],\\"b\\":\\"c\\"}",
         "headers": Object {
+          "Accept": "application/json",
           "Content-Type": "application/json",
         },
         "method": "POST",
@@ -278,6 +291,7 @@ exports[`Transport requestJson skips null and undefined keys 1`] = `
       Object {
         "body": "{\\"some\\":\\"data\\"}",
         "headers": Object {
+          "Accept": "application/json",
           "Content-Type": "application/json",
         },
         "method": "POST",

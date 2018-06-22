@@ -28,7 +28,6 @@ exports[`request passes all parameters to fetch 1`] = `
       "http://example.org",
       Object {
         "headers": Object {
-          "Accept": "application/json",
           "Authorization": "bearer yo!",
         },
         "method": "POST",
