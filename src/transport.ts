@@ -115,9 +115,8 @@ export class Transport {
       headers.Authorization = `Bearer ${token.toLowerCase()}`;
     }
 
-    const method = options.method || 'GET';
     const url = this.getUrl(path);
-    return request(url, { ...options, headers, method });
+    return request(url, { ...options, headers });
   }
 
   /**
@@ -230,16 +229,5 @@ export class Transport {
       headers,
       method: 'POST',
     });
-  }
-
-  /**
-   * Logs to the debug stream of the logger if one is configured.
-   *
-   * @param args Arbitrary arguments to log.
-   */
-  public debug(...args: any[]): void {
-    if (this.logger.debug) {
-      this.logger.debug(...args);
-    }
   }
 }
