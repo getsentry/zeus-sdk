@@ -117,7 +117,7 @@ export class Transport {
 
     const method = options.method || 'GET';
     const url = this.getUrl(path);
-    return request(url, { ...options, headers });
+    return request(url, { ...options, headers, method });
   }
 
   /**
@@ -237,7 +237,7 @@ export class Transport {
    *
    * @param args Arbitrary arguments to log.
    */
-  private debug(...args: any[]): void {
+  public debug(...args: any[]): void {
     if (this.logger.debug) {
       this.logger.debug(...args);
     }
