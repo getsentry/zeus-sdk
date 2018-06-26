@@ -117,9 +117,6 @@ export class Transport {
 
     const method = options.method || 'GET';
     const url = this.getUrl(path);
-
-    this.debug(`${method} ${url}`);
-    this.debug(`Authorization: ${headers.Authorization || 'none'}`);
     return request(url, { ...options, headers });
   }
 
