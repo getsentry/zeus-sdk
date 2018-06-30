@@ -8,6 +8,7 @@ if [ -z "${1:-}" ]; then
     set -- "patch"
 fi
 
+export npm_config_git_tag_version=false
 NPM_VERSION=$(npm version $1)
 VERSION=${NPM_VERSION:1}
 
