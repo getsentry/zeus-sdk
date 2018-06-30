@@ -1,7 +1,15 @@
 import { createWriteStream, existsSync, lstatSync } from 'fs';
 import { join } from 'path';
 import { URL } from 'whatwg-url';
-import { Artifact, Build, Job, JobStatus, Result, Status } from './models';
+import {
+  Artifact,
+  Build,
+  Job,
+  JobStatus,
+  Result,
+  RevisionInfo,
+  Status,
+} from './models';
 import { FormField, Options as TransportOptions, Transport } from './transport';
 import { getHookBase, sanitizeURL } from './utils';
 
@@ -375,5 +383,25 @@ export class Client {
       jobNumber
     );
     return this.downloadArtifacts(artifacts);
+  }
+
+  /**
+   * Retrieves revision information
+   *
+   * The revision information is aggregated across all builds for the given
+   * revision.
+   *
+   * @param owner GitHub repository owner
+   * @param repo GitHub repository name
+   * @param sha A commit revision (git hash)
+   * @returns Revision information
+   */
+  public async getRevision(
+    owner: string,
+    repo: string,
+    sha: string
+  ): Promise<RevisionInfo> {
+    const url = `/api/repos/gh/${owner}/${repo}/revisions/${sha}`;
+    return this.transport.request<RevisionInfo>(url);
   }
 }

@@ -90,6 +90,28 @@ export interface Source {
   created_at: string;
 }
 
+/** Aggregated revision information as returned by revisions API */
+export interface RevisionInfo {
+  /** Unique revision identifier. */
+  id: string;
+  /** Source information for the given revision. */
+  source: Source;
+  /** Revision status. */
+  status: Status;
+  /** Revision result. */
+  result: Result;
+  /** Human readable display label of the revision. */
+  label: string;
+  /** ISO timestamp when this source was added to Zeus. */
+  created_at: string;
+  /** ISO timestamp when the first build for the revision started. */
+  started_at?: string;
+  /** ISO timestamp when the last build for the revision finished. */
+  finished_at?: string;
+  /** Aggregate statistics of revision builds. */
+  stats: Stats;
+}
+
 /** Code coverage statistics. */
 export interface CoverageStats {
   /** The total number of source lines covered by tests. */

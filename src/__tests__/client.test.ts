@@ -267,7 +267,7 @@ describe('Client', () => {
     const owner = 'getsentry';
     const repo = 'craft';
     beforeEach(() => {
-      client = new Client({ owner, repo });
+      client = new Client();
     });
 
     test('listFilesForRevision calls correct URL', async () => {
@@ -331,6 +331,21 @@ describe('Client', () => {
       expect(client.downloadArtifact(artifact)).rejects.toThrowError(
         /directory not specified/i
       );
+    });
+  });
+
+  describe('getRevision', () => {
+    const owner = 'getsentry';
+    const repo = 'craft';
+    beforeEach(() => {
+      client = new Client();
+    });
+
+    test('listFilesForRevision calls correct URL', async () => {
+      const sha = '8c99609eeed9dc3297728411b9306e2c3786e127';
+      const expectedUrl = `/api/repos/gh/getsentry/craft/revisions/${sha}`;
+      await client.getRevision(owner, repo, sha);
+      expect(mockTransport.instance.request).toBeCalledWith(expectedUrl);
     });
   });
 });
