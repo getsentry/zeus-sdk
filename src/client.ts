@@ -6,6 +6,7 @@ import {
   Build,
   Job,
   JobStatus,
+  RepositoryInfo,
   Result,
   RevisionInfo,
   Status,
@@ -403,5 +404,20 @@ export class Client {
   ): Promise<RevisionInfo> {
     const url = `/api/repos/gh/${owner}/${repo}/revisions/${sha}`;
     return this.transport.request<RevisionInfo>(url);
+  }
+
+  /**
+   * Retrieves repository information
+   *
+   * @param owner GitHub repository owner
+   * @param repo GitHub repository name
+   * @returns Repository information
+   */
+  public async getRepositoryInfo(
+    owner: string,
+    repo: string
+  ): Promise<RepositoryInfo> {
+    const url = `/api/repos/gh/${owner}/${repo}`;
+    return this.transport.request<RepositoryInfo>(url);
   }
 }

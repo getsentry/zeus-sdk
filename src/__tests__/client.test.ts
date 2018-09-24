@@ -348,4 +348,18 @@ describe('Client', () => {
       expect(mockTransport.instance.request).toBeCalledWith(expectedUrl);
     });
   });
+
+  describe('getRepositoryInfo', () => {
+    const owner = 'getsentry';
+    const repo = 'craft';
+    beforeEach(() => {
+      client = new Client();
+    });
+
+    test('calls transport.request with the correct URL', async () => {
+      const expectedUrl = `/api/repos/gh/getsentry/craft`;
+      await client.getRepositoryInfo(owner, repo);
+      expect(mockTransport.instance.request).toBeCalledWith(expectedUrl);
+    });
+  });
 });

@@ -237,3 +237,27 @@ export interface Job {
   /** ISO timestamp when job has finished executing. */
   finished_at?: string;
 }
+
+/** A Zeus repository (project) */
+export interface RepositoryInfo {
+  /** Unique repository identifier */
+  id: string;
+  /** Identifier of the CI provider. */
+  provider: string;
+  /** VCS backend */
+  backend: string;
+  /** Fully qualified URL to the repository. */
+  url: string;
+  /** Repository name. */
+  name: string;
+  /** Repository owner. */
+  owner_name: string;
+  /** Set to true if the Zeus repository is public */
+  public: boolean;
+  /** ISO timestamp when the repository was created. */
+  created_at: string;
+  /** Full repository name in Zeus, including provider and owner. */
+  full_name: string;
+  /** Latest build information for the repository. */
+  latest_build: Build;
+}
