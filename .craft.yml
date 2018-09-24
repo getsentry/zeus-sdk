@@ -3,5 +3,5 @@ github:
   owner: getsentry
   repo: zeus-sdk
 targets:
-  - name: github
   - name: npm
+  - name: github
