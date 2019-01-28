@@ -34,6 +34,7 @@ export enum Result {
 export interface Artifact {
   /** Unique identifier of the artifact in Zeus. */
   id: string;
+
   /** File name used for downloading the file. */
   name: string;
   /** File mime type. Does not use valid IETF RFC 6838 types currently. */

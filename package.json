@@ -10,7 +10,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@sentry/typescript": "^0.5.4",
+    "@sentry/typescript": "^4.5.3",
     "@types/form-data": "^2.2.1",
     "@types/jest": "^23.0.0",
     "@types/node": "^10.3.2",
@@ -21,10 +21,9 @@
     "prettier": "^1.12.1",
     "prettier-check": "^2.0.0",
     "rimraf": "^2.6.2",
-    "ts-jest": "^22.4.6",
-    "tslint": "^5.9.1",
-    "tslint-language-service": "^0.9.9",
-    "typescript": "^2.8.3"
+    "ts-jest": "^23.10.5",
+    "tslint": "^5.12.1",
+    "typescript": "^3.2.4"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

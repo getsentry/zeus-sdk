@@ -1,11 +1,9 @@
 'use strict';
 
 module.exports = class FormData {
-  private readonly options: any;
   private readonly data: Record<string, any>;
 
-  public constructor(options: any) {
-    this.options = options;
+  public constructor() {
     this.data = {};
   }
 

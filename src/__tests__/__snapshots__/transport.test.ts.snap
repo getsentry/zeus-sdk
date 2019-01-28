@@ -13,7 +13,6 @@ exports[`Transport postForm calls request with a form data and correct headers 1
               "value": "data",
             },
           },
-          "options": undefined,
         },
         "headers": Object {
           "Accept": "application/json",
@@ -46,7 +45,6 @@ exports[`Transport postForm does not include null or undefined values 1`] = `
               "value": "data",
             },
           },
-          "options": undefined,
         },
         "headers": Object {
           "Accept": "application/json",
@@ -81,7 +79,6 @@ exports[`Transport postForm passes append options to FormData 1`] = `
               "value": "data",
             },
           },
-          "options": undefined,
         },
         "headers": Object {
           "Accept": "application/json",

@@ -1,6 +1,6 @@
 function createWriteStream(): any {
   return {
-    on: (action, callback) => {
+    on: (action: any, callback: any) => {
       if (action === 'finish') {
         callback();
       }
