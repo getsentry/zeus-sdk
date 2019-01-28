@@ -298,6 +298,7 @@ describe('Client', () => {
     const fileName = 'file.txt';
     const artifact: Artifact = {
       download_url: 'http://zeus/download/file.txt',
+      file: { name: 'file.txt', size: 1 },
       id: '123',
       name: fileName,
       status: Status.UNKNOWN,
