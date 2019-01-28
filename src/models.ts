@@ -30,11 +30,20 @@ export enum Result {
   FAILED = 'failed',
 }
 
+/** Additional file information for artifacts */
+export interface FileInfo {
+  /** Full file path in the backend */
+  name: string;
+  /** File size */
+  size: number;
+}
+
 /** A build artifact uploaded to Zeus. */
 export interface Artifact {
   /** Unique identifier of the artifact in Zeus. */
   id: string;
-
+  /** Additional file information */
+  file: FileInfo;
   /** File name used for downloading the file. */
   name: string;
   /** File mime type. Does not use valid IETF RFC 6838 types currently. */
@@ -153,9 +162,13 @@ export interface WebpackStats {
 
 /** Build or Job statistics computed by processing artifacts. */
 export interface Stats {
+  /** Code coverage statistics */
   coverage: CoverageStats;
+  /** Test statistics (passed, failed, etc.) */
   tests: TestStats;
+  /** Style violations statistics */
   style_violations: StyleStats;
+  /** Webpack asset statistics */
   webpack: WebpackStats;
 }
 

@@ -26,6 +26,7 @@ export { Response };
  */
 async function parseError(response: Response): Promise<Error> {
   try {
+    // tslint:disable-next-line:completed-docs
     const { message } = (await response.json()) as { message?: string };
     return new Error(message || `${response.status} ${response.statusText}`);
   } catch (e) {
