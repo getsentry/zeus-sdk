@@ -23,7 +23,7 @@
     "rimraf": "^2.6.2",
     "ts-jest": "^23.10.5",
     "tslint": "^5.12.1",
-    "typescript": "^3.2.4"
+    "typescript": "~3.2.4"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -39,8 +39,8 @@
   },
   "dependencies": {
     "form-data": "^2.3.2",
-    "node-fetch": "^2.1.2",
-    "tslib": "^1.9.3",
+    "node-fetch": "~2.1.2",
+    "tslib": "~1.9.3",
     "whatwg-url": "^5.0.0"
   }
 }
