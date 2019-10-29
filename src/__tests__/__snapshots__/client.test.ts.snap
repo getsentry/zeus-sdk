@@ -56,7 +56,6 @@ exports[`Client createOrUpdateJob passes job label properly 1`] = `
       Object {
         "body": Object {
           "label": "new job label",
-          "ref": undefined,
           "result": undefined,
           "status": undefined,
           "url": "https://ci/build/1234",
@@ -82,7 +81,6 @@ exports[`Client createOrUpdateJob sets the "failed" status 1`] = `
       Object {
         "body": Object {
           "label": undefined,
-          "ref": undefined,
           "result": "failed",
           "status": "finished",
           "url": "https://ci/build/1234",
@@ -108,7 +106,6 @@ exports[`Client createOrUpdateJob sets the "passed" status 1`] = `
       Object {
         "body": Object {
           "label": undefined,
-          "ref": undefined,
           "result": "passed",
           "status": "finished",
           "url": "https://ci/build/1234",
@@ -134,7 +131,6 @@ exports[`Client createOrUpdateJob sets the "pending" status 1`] = `
       Object {
         "body": Object {
           "label": undefined,
-          "ref": undefined,
           "result": "unknown",
           "status": "in_progress",
           "url": "https://ci/build/1234",
@@ -160,7 +156,6 @@ exports[`Client createOrUpdateJob strips invalid job attributes 1`] = `
       Object {
         "body": Object {
           "label": undefined,
-          "ref": undefined,
           "result": undefined,
           "status": undefined,
           "url": "https://ci/build/1234",
