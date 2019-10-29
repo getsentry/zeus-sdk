@@ -1,6 +1,6 @@
 {
   "name": "@zeus-ci/sdk",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "JavaScript SDK for https://zeus.ci",
   "main": "dist/index.js",
   "repository": "https://github.com/getsentry/zeus-sdk",
