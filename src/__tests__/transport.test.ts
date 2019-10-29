@@ -1,11 +1,14 @@
 import { Response } from 'node-fetch';
 import { request } from '../request';
 import { DEFAULT_URL, FormField, Transport } from '../transport';
-import { noop } from '../utils';
+import { noop, noopLogger } from '../utils';
 
 jest.mock('../request');
 
 const requestMock: jest.Mock<typeof request> = request as any;
+const defaultTransportOptions = {
+  logger: noopLogger,
+};
 
 describe('Transport', () => {
   beforeEach(() => {
@@ -26,21 +29,21 @@ describe('Transport', () => {
     });
 
     test('initializes with the default URL', () => {
-      const transport = new Transport();
+      const transport = new Transport(defaultTransportOptions);
       expect(transport.getUrl()).toBe(DEFAULT_URL);
     });
 
     test('reads from the ZEUS_URL environment variable', () => {
       const url = 'https://example.org/';
       process.env.ZEUS_URL = url;
-      const transport = new Transport();
+      const transport = new Transport(defaultTransportOptions);
       expect(transport.getUrl()).toBe(url);
     });
 
     test('reads from the url option', () => {
       const url = 'https://example.org/';
       process.env.ZEUS_URL = 'invalid';
-      const transport = new Transport({ url });
+      const transport = new Transport({ ...defaultTransportOptions, url });
       expect(transport.getUrl()).toBe(url);
     });
 
@@ -56,47 +59,47 @@ describe('Transport', () => {
     });
 
     test('initializes with an empty token', () => {
-      const transport = new Transport();
+      const transport = new Transport(defaultTransportOptions);
       expect(transport.getToken()).toBeUndefined();
     });
 
     test('reads from the ZEUS_TOKEN environment variable', () => {
       const token = 'zeus-u-1234567890';
       process.env.ZEUS_TOKEN = token;
-      const transport = new Transport();
+      const transport = new Transport(defaultTransportOptions);
       expect(transport.getToken()).toBe(token);
     });
 
     test('reads from the token option', () => {
       const token = 'zeus-u-1234567890';
       process.env.ZEUS_TOKEN = 'invalid';
-      const transport = new Transport({ token });
+      const transport = new Transport({ ...defaultTransportOptions, token });
       expect(transport.getToken()).toBe(token);
     });
   });
 
   describe('request', () => {
     test('issues a request without options', async () => {
-      const transport = new Transport();
+      const transport = new Transport(defaultTransportOptions);
       await transport.request('something');
       expect(requestMock).toMatchSnapshot();
     });
 
     test('resolves the response value', async () => {
-      const transport = new Transport();
+      const transport = new Transport(defaultTransportOptions);
       const response = await transport.request('something');
       expect(response).toEqual({ some: 'data' });
     });
 
     test('accepts options', async () => {
       const options = { method: 'POST', body: '{"some":"data"}' };
-      const transport = new Transport();
+      const transport = new Transport(defaultTransportOptions);
       await transport.request('something', options);
       expect(requestMock).toMatchSnapshot();
     });
 
     test('accepts absolute URLs', async () => {
-      const transport = new Transport();
+      const transport = new Transport(defaultTransportOptions);
       await transport.request('http://example.org');
       expect(requestMock).toMatchSnapshot();
     });
@@ -105,7 +108,7 @@ describe('Transport', () => {
       const headers = { Accept: 'application/json' };
       const token = 'zeus-u-1234567890';
 
-      const transport = new Transport({ token });
+      const transport = new Transport({ ...defaultTransportOptions, token });
       await transport.request('something', { headers });
       expect(requestMock).toMatchSnapshot();
     });
@@ -114,13 +117,13 @@ describe('Transport', () => {
       const headers = { Authorization: 'custom' };
       const token = 'zeus-u-1234567890';
 
-      const transport = new Transport({ token });
+      const transport = new Transport({ ...defaultTransportOptions, token });
       await transport.request('something', { headers });
       expect(requestMock).toMatchSnapshot();
     });
 
     test('rejects invalid URLs', async () => {
-      const transport = new Transport();
+      const transport = new Transport(defaultTransportOptions);
       try {
         await transport.request('///');
       } catch (e) {
@@ -129,7 +132,7 @@ describe('Transport', () => {
     });
 
     test('resolves the parsed JSON result for status 200', async () => {
-      const transport = new Transport();
+      const transport = new Transport(defaultTransportOptions);
       requestMock.mockImplementation(() => {
         const resp = new Response(JSON.stringify({ some: 'data' }));
         return Promise.resolve(resp);
@@ -140,7 +143,7 @@ describe('Transport', () => {
     });
 
     test('resolves undefined for status 204', async () => {
-      const transport = new Transport();
+      const transport = new Transport(defaultTransportOptions);
 
       requestMock.mockImplementation(
         async () =>
@@ -158,7 +161,7 @@ describe('Transport', () => {
     let transport: Transport;
 
     beforeEach(() => {
-      transport = new Transport();
+      transport = new Transport(defaultTransportOptions);
     });
 
     test('serializes a JSON payload into the request', async () => {
@@ -216,7 +219,7 @@ describe('Transport', () => {
     let transport: Transport;
 
     beforeEach(() => {
-      transport = new Transport();
+      transport = new Transport(defaultTransportOptions);
     });
 
     test('calls request with a form data and correct headers', async () => {

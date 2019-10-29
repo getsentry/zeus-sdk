@@ -1,9 +1,17 @@
 import { URL } from 'whatwg-url';
+import { Logger } from './transport';
 
-/** Noop used in place of `logger.debug`. */
+/** Noop operation. */
 export function noop(): void {
   // noop
 }
+
+export const noopLogger: Logger = {
+  error: noop,
+  info: noop,
+  log: noop,
+  warn: noop,
+};
 
 /**
  * Validates the given URL and makes sure it ends with a trailing slash.
