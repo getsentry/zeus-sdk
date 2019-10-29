@@ -116,7 +116,7 @@ export class Transport {
     }
 
     const url = this.getUrl(path);
-    return request(url, { ...options, headers });
+    return request(url, { ...options, headers }, this.logger);
   }
 
   /**

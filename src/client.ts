@@ -55,8 +55,6 @@ export interface JobOptions {
   status?: JobStatus;
   /** Fully qualified URL to the job on the CI system. */
   url?: string;
-  /** Reference to the VCS commit triggering the build. */
-  ref?: string;
 }
 
 /** Options passed to `Client` constructor */
@@ -185,7 +183,6 @@ export class Client {
     return this.transport.requestJson<Job>(url, {
       body: {
         label: options.jobLabel,
-        ref: options.ref,
         result,
         status,
         url: options.url,

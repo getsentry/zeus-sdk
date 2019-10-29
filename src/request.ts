@@ -1,4 +1,5 @@
 import fetch, { RequestInit, Response } from 'node-fetch';
+import { Logger } from './transport';
 
 /**
  * Request options.
@@ -48,11 +49,22 @@ async function parseError(response: Response): Promise<Error> {
  */
 export async function request(
   url: string,
-  options: RequestOptions = {}
+  options: RequestOptions = {},
+  logger?: Logger
 ): Promise<Response> {
   const response = await fetch(url, options);
+  if (logger && logger.debug) {
+    logger.debug(
+      `Logging request:\nURL: ${url}\nOPTIONS: ${JSON.stringify(options)}`
+    );
+  }
   if (!response.ok) {
     throw await parseError(response);
+  }
+  if (logger && logger.debug) {
+    logger.debug(
+      `Response:\nCODE: ${response.status}\nBODY: ${JSON.stringify(response)}`
+    );
   }
   return response;
 }
