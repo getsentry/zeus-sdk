@@ -108,7 +108,7 @@ describe('Transport', () => {
       const headers = { Accept: 'application/json' };
       const token = 'zeus-u-1234567890';
 
-      const transport = new Transport({ token });
+      const transport = new Transport({ ...defaultTransportOptions, token });
       await transport.request('something', { headers });
       expect(requestMock).toMatchSnapshot();
     });
@@ -117,7 +117,7 @@ describe('Transport', () => {
       const headers = { Authorization: 'custom' };
       const token = 'zeus-u-1234567890';
 
-      const transport = new Transport({ token });
+      const transport = new Transport({ ...defaultTransportOptions, token });
       await transport.request('something', { headers });
       expect(requestMock).toMatchSnapshot();
     });
