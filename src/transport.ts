@@ -67,7 +67,12 @@ export class Transport {
   public constructor(options: Options = {}) {
     this.url = sanitizeURL(options.url || process.env.ZEUS_URL || DEFAULT_URL);
     this.token = options.token || process.env.ZEUS_TOKEN || undefined;
-    this.logger = options.logger || console;
+    this.logger = options.logger || {
+      error: noop,
+      info: noop,
+      log: noop,
+      warn: noop,
+    };
 
     if (!this.logger.debug) {
       this.logger.debug = noop;

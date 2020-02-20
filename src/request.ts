@@ -36,14 +36,14 @@ async function parseError(response: Response): Promise<Error> {
 }
 
 /**
- * Performs an AJAX request to the given url with the specified options using
+ * Performs a request to the given url with the specified options using
  * fetch.
  *
  * After the request has finished, the result is parsed and checked for errors.
  * In case of an error, the response message is thrown as an error. On success,
  * the response object is passed into the promise.
  *
- * @param url The destination of the AJAX call.
+ * @param url The destination endpoint.
  * @param options Options to the fetch call.
  * @returns A Promise to the parsed response body.
  */
@@ -52,19 +52,21 @@ export async function request(
   options: RequestOptions = {},
   logger?: Logger
 ): Promise<Response> {
-  const response = await fetch(url, options);
   if (logger && logger.debug) {
     logger.debug(
       `Logging request:\nURL: ${url}\nOPTIONS: ${JSON.stringify(options)}`
     );
   }
-  if (!response.ok) {
-    throw await parseError(response);
-  }
+
+  const response = await fetch(url, options);
+
   if (logger && logger.debug) {
     logger.debug(
       `Response:\nCODE: ${response.status}\nBODY: ${JSON.stringify(response)}`
     );
+  }
+  if (!response.ok) {
+    throw await parseError(response);
   }
   return response;
 }
